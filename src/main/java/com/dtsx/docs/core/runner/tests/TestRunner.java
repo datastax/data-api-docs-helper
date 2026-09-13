@@ -22,7 +22,17 @@ public class TestRunner {
     }
 
     public static boolean runTests(TestCtx ctx, TestPlan plan) {
-        return new TestRunner(ctx, plan).runAllTests();
+        val ok = new TestRunner(ctx, plan).runAllTests();
+
+        if (!ok) {
+            return false;
+        }
+
+        ctx.reporter().printDuplicates(
+            () -> DuplicatesFinder.findDuplicates(ctx.examplesFolder())
+        );
+
+        return true;
     }
 
     // Don't love using exceptions for control flow, but eh, keeps it simple here

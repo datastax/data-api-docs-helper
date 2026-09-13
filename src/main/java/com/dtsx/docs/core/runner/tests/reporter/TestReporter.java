@@ -4,6 +4,8 @@ import com.dtsx.docs.commands.test.TestCtx;
 import com.dtsx.docs.core.planner.TestPlan;
 import com.dtsx.docs.core.planner.TestRoot;
 import com.dtsx.docs.core.planner.fixtures.JSFixture;
+import com.dtsx.docs.core.runner.tests.DuplicatesFinder.Duplicate;
+import com.dtsx.docs.core.runner.tests.DuplicatesFinder.Duplicates;
 import com.dtsx.docs.core.runner.tests.results.TestOutcome;
 import com.dtsx.docs.core.runner.tests.results.TestOutcome.*;
 import com.dtsx.docs.core.runner.tests.results.TestResults;
@@ -16,6 +18,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import picocli.CommandLine.Help.Ansi.Style;
 
 import java.util.Comparator;
+import java.util.function.Supplier;
 
 import static com.dtsx.docs.core.runner.tests.VerifyMode.DRY_RUN;
 import static com.dtsx.docs.lib.ColorUtils.color;
@@ -108,6 +111,34 @@ public abstract class TestReporter {
         if (skippedTests > 0) {
             CliLogger.println(true, "@!-!@ Bailed tests: " + skippedTests);
         }
+    }
+
+    public void printDuplicates(Supplier<Duplicates> findDuplicates) {
+        CliLogger.println(true, "\n@|bold Scanning for duplicate snapshots...|@");
+        CliLogger.println(true);
+
+        val duplicates = findDuplicates.get();
+        val unwrapped = duplicates.unwrap();
+
+        if (unwrapped.isEmpty()) {
+            CliLogger.println(true, "@|green ✓|@ No unnecessarily unique snapshot files found!");
+            return;
+        }
+
+        CliLogger.println(true, "@|bold,yellow Warning: found|@ @!" + duplicates.totalCount() + "!@ @|bold,yellow unnecessarily unique snapshot file(s):|@");
+        CliLogger.println(true);
+
+        for (var i = 0; i < unwrapped.size(); i++) {
+            printDuplicate(unwrapped.get(i));
+            if (i < unwrapped.size() - 1) {
+                CliLogger.println(true);
+            }
+        }
+    }
+
+    private void printDuplicate(Duplicate duplicate) {
+        CliLogger.println(true, "  @|red ✗|@ @|faint Root:|@ " + duplicate.testPath());
+        CliLogger.println(true, "    @|faint Languages:|@ @|yellow " + String.join(", ", duplicate.languages()) + "|@");
     }
 
     /// Helper to print a numbered fixture heading.

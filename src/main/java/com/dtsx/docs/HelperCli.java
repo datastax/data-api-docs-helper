@@ -2,7 +2,6 @@ package com.dtsx.docs;
 
 import com.dtsx.docs.commands.completions.CompgenCmd;
 import com.dtsx.docs.commands.docgen.DocgenCmd;
-import com.dtsx.docs.commands.duplicates.DuplicatesCmd;
 import com.dtsx.docs.commands.logs.LogsCmd;
 import com.dtsx.docs.commands.review.ReviewCmd;
 import com.dtsx.docs.commands.run.RunCmd;
@@ -31,7 +30,6 @@ import static com.dtsx.docs.lib.ColorUtils.ACCENT_COLOR;
         ReviewCmd.class,
         CompgenCmd.class,
         LogsCmd.class,
-        DuplicatesCmd.class,
         StartgateCmd.class,
         DocgenCmd.class,
     }
